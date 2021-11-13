@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { CONNECTION_STRING } = process.env;
 const Sequelize = require("sequelize");
+const { SELECT } = require("sequelize/types/lib/query-types");
 const sequelize = new Sequelize(CONNECTION_STRING, {
     dialect: "postgres",
     dialectOptions: {
@@ -228,14 +229,32 @@ module.exports = {
     },
     
     getCountries: (req, res) => {
-        sequelize.query(`select city_id, name, rating, country_id
-        from cc_appointments a
-        join cc_emp_appts ea on a.appt_id = ea.appt_id
-        join cc_employees e on e.emp_id = ea.emp_id
-        join cc_users u on e.user_id = u.user_id
-        where a.approved = true and a.completed = false
-        order by a.date desc;`)
+        sequelize.query(
+            ` select * from countries `
+           
+            )
             .then(dbRes => res.status(200).send(dbRes[0]))
             .catch(err => console.log(err))
     },
+
+    createCity: (req, res) => {
+        let {name, rating, country_Id} = req.body
+        sequelize.query(
+            
+            `INSERT INTO cities(name, rating, country_ID)
+            VALUES 
+            ${name}
+            ${rating}
+            ${country_id}`
+            
+
+            )
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
+
+    getCities: (req, res) => {
+        sequelize.query(
+            SELECT
+        )
 }
