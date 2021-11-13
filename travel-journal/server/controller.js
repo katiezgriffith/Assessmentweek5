@@ -14,11 +14,14 @@ module.exports = {
         sequelize.query(`
             drop table if exists cities;
             drop table if exists countries;
+            create table cities (
+                    city_id serial primary key,
+                    name varchar,
+                    rating integer,
+                    country_id integer
+                );
 
-            create table countries (
-                country_id serial primary key, 
-                name varchar
-            );
+           
 
          
 
@@ -222,5 +225,17 @@ module.exports = {
             console.log('DB seeded!')
             res.sendStatus(200)
         }).catch(err => console.log('error seeding DB', err))
-    }
+    },
+    
+    getCountries: (req, res) => {
+        sequelize.query(`select city_id, name, rating, country_id
+        from cc_appointments a
+        join cc_emp_appts ea on a.appt_id = ea.appt_id
+        join cc_employees e on e.emp_id = ea.emp_id
+        join cc_users u on e.user_id = u.user_id
+        where a.approved = true and a.completed = false
+        order by a.date desc;`)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
 }
