@@ -1,7 +1,9 @@
 require("dotenv").config();
-const { CONNECTION_STRING } = process.env;
+
 const Sequelize = require("sequelize");
-const { SELECT } = require("sequelize/types/lib/query-types");
+
+const { CONNECTION_STRING } = process.env;
+
 const sequelize = new Sequelize(CONNECTION_STRING, {
     dialect: "postgres",
     dialectOptions: {
@@ -10,21 +12,24 @@ const sequelize = new Sequelize(CONNECTION_STRING, {
         },
     },
 });
+
 module.exports = {
     seed: (req, res) => {
         sequelize.query(`
             drop table if exists cities;
             drop table if exists countries;
+
+            create table countries (
+                country_id serial primary key, 
+                name varchar
+            );
+
             create table cities (
-                    city_id serial primary key,
-                    name varchar,
-                    rating integer,
-                    country_id integer
-                );
-
-           
-
-         
+                city_id serial primary key,
+                name varchar,
+                rating integer,
+                country_id serial
+            );    
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -227,34 +232,51 @@ module.exports = {
             res.sendStatus(200)
         }).catch(err => console.log('error seeding DB', err))
     },
-    
-    getCountries: (req, res) => {
-        sequelize.query(
-            ` select * from countries `
-           
-            )
-            .then(dbRes => res.status(200).send(dbRes[0]))
-            .catch(err => console.log(err))
-    },
+   
+getCountries: (req, res) => {
+    sequelize.query(
+        `SELECT * FROM countries`)
+    .then(dbRes => res.status(200).send(dbRes[0]))
+    .catch(err => console.log(err));
+},
 
-    createCity: (req, res) => {
-        let {name, rating, country_Id} = req.body
-        sequelize.query(
-            
-            `INSERT INTO cities(name, rating, country_ID)
-            VALUES 
-            ${name}
-            ${rating}
-            ${country_id}`
-            
+createCity: (req, res) => {
+const {name, rating, countryId} = req.body
+sequelize
+    .query(
+        `INSERT INTO cities (name, rating, country_id)
+        VALUES ('${name}', '${rating}', '${countryId}');
+    `)
+    .then(dbRes => res.status(200).send(dbRes[0]))
 
-            )
-            .then(dbRes => res.status(200).send(dbRes[0]))
-            .catch(err => console.log(err))
-    },
+    .catch(err => console.log(err));
+},
 
-    getCities: (req, res) => {
-        sequelize.query(
-            SELECT
-        )
+getCities: (req, res) => {
+    sequelize
+    .query(`
+    SELECT
+    city.city_id, city.name city, city.rating,
+    country.country_id, country.name AS country  
+    FROM cities city
+    JOIN countries country
+    on city.country_id = country.country_id;`
+
+    )
+.then(dbRes => res.status(200).send(dbRes[0]))
+.catch(err => console.log(err));
+},
+
+
+    deleteCity: (req, res) => {
+    const cityId = req.params.id;
+    sequelize
+    .query(
+        `DELETE FROM CITIES where city_id = ${cityId}`
+ )
+    .then(dbRes => res.status(200).send(dbRes[0]))
+    .catch(err => console.log(err));
+}
+
+
 }
