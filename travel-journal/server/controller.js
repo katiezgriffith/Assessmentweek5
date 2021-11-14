@@ -32,9 +32,9 @@ module.exports = {
             );    
             
             insert into cities (name, rating, country_id)
-            values ('Ville Platte', '2', '1'),
-            ('Opelousas', '2', '1'),
-            ('Eunice', '1', '1');
+            values ('Ville Platte', '2', '187'),
+            ('Opelousas', '2', '187'),
+            ('Eunice', '1', '187');
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -238,11 +238,11 @@ module.exports = {
         }).catch(err => console.log('error seeding DB', err))
     },
    
-getCountries: (req, res) => {
-    sequelize.query(
-        `SELECT * FROM countries`)
-    .then(dbRes => res.status(200).send(dbRes[0]))
-    .catch(err => console.log(err));
+    getCountries: (req, res) => {
+        sequelize.query(
+            `SELECT * FROM countries`)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err));
 },
 
 createCity: (req, res) => {
