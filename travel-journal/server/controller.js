@@ -30,6 +30,11 @@ module.exports = {
                 rating integer,
                 country_id serial
             );    
+            
+            insert into cities (name, rating, country_id)
+            values ('Ville Platte', '2', '1'),
+            ('Opelousas', '2', '1'),
+            ('Eunice', '1', '1');
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -260,8 +265,8 @@ getCities: (req, res) => {
     country.country_id, country.name AS country  
     FROM cities city
     JOIN countries country
-    on city.country_id = country.country_id;`
-
+    on city.country_id = country.country_id
+    ORDER BY city.rating desc;`
     )
 .then(dbRes => res.status(200).send(dbRes[0]))
 .catch(err => console.log(err));
